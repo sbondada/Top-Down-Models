@@ -30,62 +30,70 @@ using namespace tptg;
 
 void TripartiteGraph::constructTPTGraph()
 {
-	 typedef typename tptg::UndirectedGraph::vertex_property_type Name;
-	 for(int i=0;i<vparam.firstvlist.size();i++)
-	 {
-		 frstlist.nodelist.push_back(add_vertex(Name(vparam.firstvlist[i]),udgraph));
-	 }
-	 for(int i=0;i<vparam.secondvlist.size();i++)
-	 {
-		 scndlist.nodelist.push_back(add_vertex(Name(vparam.secondvlist[i]),udgraph));
-	 }
-	 for(int i=0;i<vparam.thirdvlist.size();i++)
-	 {
-		 thrdlist.nodelist.push_back(add_vertex(Name(vparam.thirdvlist[i]),udgraph));
-	 } 
-	 
-	std::vector<std::string> splitstr;
-	typename graph_traits<tptg::UndirectedGraph>::vertex_descriptor src,tgt;
-	int matchsrc,matchtgt;
-	for(int i=0;i<eparam.firstsecondelist.size();i++)
+	if(eparam.firstsecondelist.size()>0 && eparam.firstsecondelist.size()>0 && vparam.firstvlist.size()>0 && vparam.secondvlist.size()>0 && vparam.thirdvlist.size()>0)
 	{
-	boost::split(splitstr,eparam.firstsecondelist[i].first,boost::is_any_of("-"));
-	if(splitstr.size()==2)
-	{
-		matchsrc=getIndex(vparam.firstvlist,splitstr[0]);
-		matchtgt=getIndex(vparam.secondvlist,splitstr[1]);
-		if(matchsrc!=-1 && matchtgt!=-1)
+		 typedef typename tptg::UndirectedGraph::vertex_property_type Name;
+		 for(int i=0;i<vparam.firstvlist.size();i++)
+		 {
+			 frstlist.nodelist.push_back(add_vertex(Name(vparam.firstvlist[i]),udgraph));
+		 }
+		 for(int i=0;i<vparam.secondvlist.size();i++)
+		 {
+			 scndlist.nodelist.push_back(add_vertex(Name(vparam.secondvlist[i]),udgraph));
+		 }
+		 for(int i=0;i<vparam.thirdvlist.size();i++)
+		 {
+			 thrdlist.nodelist.push_back(add_vertex(Name(vparam.thirdvlist[i]),udgraph));
+		 } 
+		 
+		std::vector<std::string> splitstr;
+		typename graph_traits<tptg::UndirectedGraph>::vertex_descriptor src,tgt;
+		int matchsrc,matchtgt;
+		for(int i=0;i<eparam.firstsecondelist.size();i++)
 		{
-		src=frstlist.nodelist[matchsrc];
-		tgt=scndlist.nodelist[matchtgt];
-		typename graph_traits<tptg::UndirectedGraph>::edge_descriptor e1;
-		bool found;
-		boost::tie(e1,found)=add_edge(src,tgt,udgraph); 
-		udgraph[e1].edgename=eparam.firstsecondelist[i].first;
-		udgraph[e1].weight=eparam.firstsecondelist[i].second;
-		}	
-	}
-	}
-	for(int i=0;i<eparam.secondthirdelist.size();i++)
-	{
-	boost::split(splitstr,eparam.secondthirdelist[i].first,boost::is_any_of("-"));
-	if(splitstr.size()==2)
-	{
-		matchsrc=getIndex(vparam.secondvlist,splitstr[0]);
-		matchtgt=getIndex(vparam.thirdvlist,splitstr[1]);
-		if(matchsrc!=-1 && matchtgt!=-1)
+			boost::split(splitstr,eparam.firstsecondelist[i].first,boost::is_any_of("-"));
+			if(splitstr.size()==2)
+			{
+				matchsrc=getIndex(vparam.firstvlist,splitstr[0]);
+				matchtgt=getIndex(vparam.secondvlist,splitstr[1]);
+				if(matchsrc!=-1 && matchtgt!=-1)
+				{
+					src=frstlist.nodelist[matchsrc];
+					tgt=scndlist.nodelist[matchtgt];
+					typename graph_traits<tptg::UndirectedGraph>::edge_descriptor e1;
+					bool found;
+					boost::tie(e1,found)=add_edge(src,tgt,udgraph); 
+					udgraph[e1].edgename=eparam.firstsecondelist[i].first;
+					udgraph[e1].weight=eparam.firstsecondelist[i].second;
+				}	
+			}
+		}
+		for(int i=0;i<eparam.secondthirdelist.size();i++)
 		{
-		src=scndlist.nodelist[matchsrc];
-		tgt=thrdlist.nodelist[matchtgt];
-		typename graph_traits<tptg::UndirectedGraph>::edge_descriptor e1;
-		bool found;
-		boost::tie(e1,found)=add_edge(src,tgt,udgraph); 
-		udgraph[e1].edgename=eparam.secondthirdelist[i].first;
-		udgraph[e1].weight=eparam.secondthirdelist[i].second;
-		}	
+			boost::split(splitstr,eparam.secondthirdelist[i].first,boost::is_any_of("-"));
+			if(splitstr.size()==2)
+			{
+				matchsrc=getIndex(vparam.secondvlist,splitstr[0]);
+				matchtgt=getIndex(vparam.thirdvlist,splitstr[1]);
+				if(matchsrc!=-1 && matchtgt!=-1)
+				{
+					src=scndlist.nodelist[matchsrc];
+					tgt=thrdlist.nodelist[matchtgt];
+					typename graph_traits<tptg::UndirectedGraph>::edge_descriptor e1;
+					bool found;
+					boost::tie(e1,found)=add_edge(src,tgt,udgraph); 
+					udgraph[e1].edgename=eparam.secondthirdelist[i].first;
+					udgraph[e1].weight=eparam.secondthirdelist[i].second;
+				}	
+			}
+		}
+		return ;
 	}
+	else
+	{
+		cout<<"load the edge parameters before constructing the graph"<<endl;
+		return;
 	}
-	return ;
 }
 
 int TripartiteGraph::getIndex(std::vector<std::string>& collist,std::string matchstr)
@@ -118,30 +126,30 @@ edgeprop TripartiteGraph::getEdgeDescription(std::string source,std::string targ
 	int matchsrc,matchtgt;
 	if(sourcetype==first)
 	{
-	matchsrc=getIndex(vparam.firstvlist,source);
-	matchtgt=getIndex(vparam.secondvlist,target);
+		matchsrc=getIndex(vparam.firstvlist,source);
+		matchtgt=getIndex(vparam.secondvlist,target);
 		if(matchsrc!=-1 && matchtgt!=-1)
 		{
-		src=frstlist.nodelist[matchsrc];
-		tgt=scndlist.nodelist[matchtgt];
-	    boost::tie(e1,found)=edge(src,tgt,udgraph);
-	    edgedescription.edgename=get(edgname,e1);
-	    edgedescription.weight=get(edgweight,e1);
-	    return edgedescription;
+			src=frstlist.nodelist[matchsrc];
+			tgt=scndlist.nodelist[matchtgt];
+			boost::tie(e1,found)=edge(src,tgt,udgraph);
+			edgedescription.edgename=get(edgname,e1);
+			edgedescription.weight=get(edgweight,e1);
+			return edgedescription;
 		}
 	}	
 	else if(sourcetype==second)
 	{
-	matchsrc=getIndex(vparam.secondvlist,source);
-	matchtgt=getIndex(vparam.thirdvlist,target);
+		matchsrc=getIndex(vparam.secondvlist,source);
+		matchtgt=getIndex(vparam.thirdvlist,target);
 		if(matchsrc!=-1 && matchtgt!=-1)
 		{
-		src=scndlist.nodelist[matchsrc];
-		tgt=thrdlist.nodelist[matchtgt];
-		boost::tie(e1,found)=edge(src,tgt,udgraph);
-	    edgedescription.edgename=get(edgname,e1);
-	    edgedescription.weight=get(edgweight,e1);
-	    return edgedescription;
+			src=scndlist.nodelist[matchsrc];
+			tgt=thrdlist.nodelist[matchtgt];
+			boost::tie(e1,found)=edge(src,tgt,udgraph);
+			edgedescription.edgename=get(edgname,e1);
+			edgedescription.weight=get(edgweight,e1);
+			return edgedescription;
 		}
 	}	
 	cout<<"edge not found"<<endl;
@@ -171,4 +179,66 @@ std::string TripartiteGraph::getVertexDescription(std::string nodename,type word
 	return get(vname,vertexnode);
 }
 
+void TripartiteGraph::loadEdgeParameters(std::string filename,type sourcetype)
+{
+	std::vector<std::string> splitstr;
+	std::string linestr;
+	std::ifstream infile;
+	infile.open (filename.c_str());
+	unsigned int index=0;
+	if(sourcetype==first)
+	{
+        while(std::getline(infile,linestr))// To get you all the lines.
+        {
+		    boost::split(splitstr,linestr,boost::is_any_of("\t"));
+			if(splitstr.size()==5)
+		    {
+				eparam.firstsecondelist.push_back(std::make_pair(splitstr[4],atoi(splitstr[1].c_str())));
+				index++;
+			}
+        }
+	}
+	else
+	{
+		while(std::getline(infile,linestr))// To get you all the lines.
+        {
+		    boost::split(splitstr,linestr,boost::is_any_of("\t"));
+			if(splitstr.size()==5)
+		    {
+				eparam.secondthirdelist.push_back(std::make_pair(splitstr[4],atoi(splitstr[1].c_str())));
+				index++;
+			}
+        }
+	}
+	infile.close();
+}
 
+void TripartiteGraph::loadVertexParameters(const char* nodelist[],type sourcetype)
+{
+	//hard coded the size of the nodelist,need to genralize them
+	unsigned int i=0;
+	if(sourcetype==first)
+	{
+		while(i<20)
+		{
+			vparam.firstvlist.push_back(nodelist[i]);
+			i++;
+		}
+	}
+	else if(sourcetype==second)
+	{
+		while(i<49)
+		{
+			vparam.secondvlist.push_back(nodelist[i]);
+			i++;
+		}
+	}
+	else
+	{
+		while(i<20)
+		{
+			vparam.thirdvlist.push_back(nodelist[i]);
+			i++;
+		}
+	}
+}

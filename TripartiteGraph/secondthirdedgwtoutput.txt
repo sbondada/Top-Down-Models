@@ -1,0 +1,2 @@
+	24			talk-person
+	34			fence-person
